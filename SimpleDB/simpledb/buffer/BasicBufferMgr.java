@@ -1,5 +1,7 @@
 package simpledb.buffer;
 
+import java.util.LinkedHashMap;
+
 import simpledb.file.*;
 
 /**
@@ -10,6 +12,27 @@ import simpledb.file.*;
 class BasicBufferMgr {
    private Buffer[] bufferpool;
    private int numAvailable;
+	   
+   //New bufferPool for CSC540 Project2
+   private LinkedHashMap<Block,Buffer> bufferPoolMap;
+   
+   //2 Method Required by TA's
+   /**
+   * Determines whether the map has a mapping from
+   * the block to some buffer.
+   * @param blk the block to use as a key
+   * @return true if there is a mapping; false otherwise */
+   boolean containsMapping(Block blk) { 
+	   return bufferPoolMap.containsKey(blk);
+   }
+   /**
+   * Returns the buffer that the map maps the specified block to.
+   * @param blk the block to use as a key
+   * @return the buffer mapped to if there is a mapping; null otherwise */
+   Buffer getMapping(Block blk) {
+	   return bufferPoolMap.get(blk);
+   
+   }
    
    /**
     * Creates a buffer manager having the specified number 
@@ -25,6 +48,10 @@ class BasicBufferMgr {
     * @param numbuffs the number of buffer slots to allocate
     */
    BasicBufferMgr(int numbuffs) {
+	   bufferPoolMap = new LinkedHashMap<Block,Buffer>(numbuffs);
+	   numAvailable = numbuffs;
+	   
+	   
       bufferpool = new Buffer[numbuffs];
       numAvailable = numbuffs;
       for (int i=0; i<numbuffs; i++)

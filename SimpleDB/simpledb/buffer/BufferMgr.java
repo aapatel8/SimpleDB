@@ -22,6 +22,26 @@ public class BufferMgr {
    private static final long MAX_TIME = 10000; // 10 seconds
    private BasicBufferMgr bufferMgr;
    
+   
+   //2 Method Required by TA's
+   
+   /**
+   * Determines whether the map has a mapping from
+   * the block to some buffer.
+   * @param blk the block to use as a key   
+   * @return true if there is a mapping; false otherwise */
+   public boolean containsMapping(Block blk) { 
+	   return bufferMgr.containsMapping(blk);
+   }
+   /**
+   * Returns the buffer that the map maps the specified block to.
+   * @param blk the block to use as a key
+   * @return the buffer mapped to if there is a mapping; null otherwise */
+   public Buffer getMapping(Block blk) { 
+	   return bufferMgr.getMapping(blk);
+   }
+   
+  
    /**
     * Creates a new buffer manager having the specified 
     * number of buffers.
