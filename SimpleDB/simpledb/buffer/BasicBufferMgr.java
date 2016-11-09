@@ -14,24 +14,23 @@ class BasicBufferMgr {
    private int numAvailable;
 	   
    //New bufferPool for CSC540 Project2
-   private LinkedHashMap<Block,Buffer> bufferPoolMap;
+   private BufferPoolMap bufferPoolMap;
    
-   //2 Method Required by TA's
+   //2 Methods Required by TA's
    /**
    * Determines whether the map has a mapping from
    * the block to some buffer.
    * @param blk the block to use as a key
    * @return true if there is a mapping; false otherwise */
-   boolean containsMapping(Block blk) { 
+   public boolean containsMapping(Block blk) { 
 	   return bufferPoolMap.containsKey(blk);
    }
    /**
    * Returns the buffer that the map maps the specified block to.
    * @param blk the block to use as a key
    * @return the buffer mapped to if there is a mapping; null otherwise */
-   Buffer getMapping(Block blk) {
+   public Buffer getMapping(Block blk) {
 	   return bufferPoolMap.get(blk);
-   
    }
    
    /**
@@ -48,7 +47,8 @@ class BasicBufferMgr {
     * @param numbuffs the number of buffer slots to allocate
     */
    BasicBufferMgr(int numbuffs) {
-	   bufferPoolMap = new LinkedHashMap<Block,Buffer>(numbuffs);
+	   //Initial thoughts, not sure if right way tho...
+	   bufferPoolMap = new BufferPoolMap(numbuffs);
 	   numAvailable = numbuffs;
 	   
 	   
