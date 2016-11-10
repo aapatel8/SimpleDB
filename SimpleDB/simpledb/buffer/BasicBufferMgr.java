@@ -63,9 +63,14 @@ class BasicBufferMgr {
     * @param txnum the transaction's id number
     */
    synchronized void flushAll(int txnum) {
-      for (Buffer buff : bufferpool)
-         if (buff.isModifiedBy(txnum))
-         buff.flush();
+	   //New Method
+	   bufferPoolMap.flush(txnum);
+	   
+	   
+	   
+//      for (Buffer buff : bufferpool)
+//         if (buff.isModifiedBy(txnum))
+//         buff.flush();
    }
    
    /**
@@ -129,12 +134,15 @@ class BasicBufferMgr {
    }
    
    private Buffer findExistingBuffer(Block blk) {
-      for (Buffer buff : bufferpool) {
-         Block b = buff.block();
-         if (b != null && b.equals(blk))
-            return buff;
-      }
-      return null;
+	   //New Method
+	   return bufferPoolMap.findExistingBuffer(blk);
+	   
+//      for (Buffer buff : bufferpool) {
+//         Block b = buff.block();
+//         if (b != null && b.equals(blk))
+//            return buff;
+//      }
+//      return null;
    }
    
    private Buffer chooseUnpinnedBuffer() {

@@ -16,7 +16,18 @@ public class BufferPoolMap {
 		bufferPoolMap = new LinkedHashMap<Block,Buffer>(numbuffs);
 	}
 	
-	
+	/**
+    * Flushes the dirty buffers modified by the specified transaction.
+    * @param txnum the transaction's id number
+    */
+	public void flush(int txnum){
+		for (Map.Entry<Block, Buffer> entry : bufferPoolMap.entrySet()) {
+		    //Block blk = entry.getKey();
+		    Buffer buff = entry.getValue();
+		    if (buff.isModifiedBy(txnum))
+		         buff.flush();
+		}
+	}
 	
 	
 	//2 TA Methods
@@ -27,6 +38,10 @@ public class BufferPoolMap {
 	public Buffer get(Block blk) {
 	   return bufferPoolMap.get(blk);
     }
+
+	public Buffer findExistingBuffer(Block blk) {
+		return get(blk);
+	}
 	
 	
 }
