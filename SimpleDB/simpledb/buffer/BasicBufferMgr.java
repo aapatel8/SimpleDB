@@ -83,7 +83,12 @@ class BasicBufferMgr {
     * @return the pinned buffer
     */
    synchronized Buffer pin(Block blk) {
-      Buffer buff = findExistingBuffer(blk);
+	   Buffer buff = findExistingBuffer(blk);
+	   
+	   
+	   
+	   
+	   //Buffer buff = findExistingBuffer(blk);
       if (buff == null) {
          buff = chooseUnpinnedBuffer();
          if (buff == null)
@@ -106,13 +111,31 @@ class BasicBufferMgr {
     * @return the pinned buffer
     */
    synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
-      Buffer buff = chooseUnpinnedBuffer();
-      if (buff == null)
-         return null;
-      buff.assignToNew(filename, fmtr);
-      numAvailable--;
-      buff.pin();
-      return buff;
+	   //If none available, then return null, catch outside of this and do 
+	   if (numAvailable == 0){
+		   return null;
+	   }
+	   //First just try to add new buffer, if queue is not full
+	   Buffer buff = bufferPoolMap.addNew(filename, fmtr);
+	   if (buff == null) {
+		   //queue was full, so use fifo to remove oldest unpinned buffer
+		   buff = bufferPoolMap.chooseBufferFIFO();
+		   buff.assignToNew(filename, fmtr);
+		   //b/c it was replaced we add it to the end of the queue
+		   bufferPoolMap.addToEndOfQueue(buff);
+	   }
+	   numAvailable--;
+	   buff.pin();
+	   return buff; 
+	   
+	   
+//      Buffer buff = chooseUnpinnedBuffer();
+//      if (buff == null)
+//         return null;
+//      buff.assignToNew(filename, fmtr);
+//      numAvailable--;
+//      buff.pin();
+//      return buff;
    }
    
    /**
@@ -146,8 +169,6 @@ class BasicBufferMgr {
    }
    
    private Buffer chooseUnpinnedBuffer() {
-	   //return bufferPoolMap.chooseUnpinnedBuffer();
-	   
       for (Buffer buff : bufferpool)
          if (!buff.isPinned())
          return buff;

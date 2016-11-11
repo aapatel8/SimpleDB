@@ -11,9 +11,11 @@ import simpledb.file.*;
  */
 public class BufferPoolMap {
 	private LinkedHashMap<Block,Buffer> bufferPoolMap;
+	private int capacity;
 	
 	public BufferPoolMap(int numbuffs){
 		bufferPoolMap = new LinkedHashMap<Block,Buffer>(numbuffs);
+		this.capacity = numbuffs;
 	}
 	
 	/**
@@ -43,5 +45,70 @@ public class BufferPoolMap {
 		return get(blk);
 	}
 	
+	public Buffer chooseBufferFIFO(){
+		return removeOldestUnpinned();
+	}
+	
+	/**
+	 * tries to create and add a new buffer to the queue, if queue not at capacity
+	 * if at capacity, return null, FIFO required 
+	 * @param filename
+	 * @param fmtr
+	 * @return new buffer or null
+	 */
+	public Buffer addNew(String filename, PageFormatter fmtr){
+		if (bufferPoolMap.size() == this.capacity){
+			return null;
+		} else {
+			Buffer buff = new Buffer();
+			buff.assignToNew(filename, fmtr);
+			bufferPoolMap.put(buff.block(), buff);
+			return buff;
+		}
+	}
+	
+	/**
+	 * adds buffer to the end of the queue
+	 * @param buff
+	 */
+	public void addToEndOfQueue(Buffer buff){
+		bufferPoolMap.put(buff.block(), buff);
+	}
+	
+	/**
+	 * removes and returns the oldest buffer that is unpinned in the queue/map
+	 * @return the Buffer object that is at the head of the queue
+	 */
+	public Buffer removeOldestUnpinned(){
+		//removes and returns first buffer in the queue that is NOT pinned AKA not in use
+		boolean found = false;
+		Buffer buff = null;
+		for( Block blk : bufferPoolMap.keySet() ){
+			if (!found){
+				if (!bufferPoolMap.get(blk).isPinned()){
+					buff = bufferPoolMap.remove(blk);
+					found = true;
+				}
+			}
+		}
+		return buff;
+	}
+	/**
+	 * returns but does NOT remove the head of the queue
+	 * if empty queue returns null
+	 * @return
+	 */
+	public Buffer peek(){
+		//only return the first buffer or null if nothing in the queue/map
+		boolean found = false;
+		Buffer buff = null;
+		for( Block blk : bufferPoolMap.keySet() ){
+			if (!found){
+				buff = bufferPoolMap.get(blk);
+				found = true;
+			}
+		}
+		return buff;
+	}
 	
 }

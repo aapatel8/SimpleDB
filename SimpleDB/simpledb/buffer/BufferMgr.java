@@ -94,6 +94,10 @@ public class BufferMgr {
     * @return the buffer pinned to that block
     */
    public synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
+	   
+	   
+	   
+	   
       try {
          long timestamp = System.currentTimeMillis();
          Buffer buff = bufferMgr.pinNew(filename, fmtr);
