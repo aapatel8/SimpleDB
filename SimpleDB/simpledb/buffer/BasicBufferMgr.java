@@ -89,7 +89,7 @@ class BasicBufferMgr {
 	   }
 	   Buffer buff = findExistingBuffer(blk);
 	   if (buff == null) {
-		   //queue was full, so use fifo to remove oldest unpinned buffer
+		   //block was not in the map, so use fifo to remove oldest unpinned buffer
 		   buff = bufferPoolMap.chooseBufferFIFO();
 		   buff.assignToBlock(blk);
 		   //b/c it was replaced we add it to the end of the queue

@@ -1,6 +1,8 @@
 package simpledb.buffer;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import simpledb.file.*;
@@ -45,7 +47,7 @@ public class BufferPoolMap {
 		return get(blk);
 	}
 	
-	public Buffer chooseBufferFIFO(){
+	public synchronized Buffer chooseBufferFIFO(){
 		return removeOldestUnpinned();
 	}
 	
@@ -83,12 +85,13 @@ public class BufferPoolMap {
 		//removes and returns first buffer in the queue that is NOT pinned AKA not in use
 		boolean found = false;
 		Buffer buff = null;
-		for( Block blk : bufferPoolMap.keySet() ){
-			if (!found){
-				if (!bufferPoolMap.get(blk).isPinned()){
-					buff = bufferPoolMap.remove(blk);
-					found = true;
-				}
+		Iterator<Entry<Block, Buffer>> it = bufferPoolMap.entrySet().iterator();
+		while (it.hasNext() && !found) {
+			Map.Entry<Block, Buffer> item = it.next();
+			if(!item.getValue().isPinned()){
+				buff = item.getValue();
+				it.remove();
+				found = true;
 			}
 		}
 		return buff;
@@ -103,6 +106,7 @@ public class BufferPoolMap {
 		//only return the first buffer or null if nothing in the queue/map
 		boolean found = false;
 		Buffer buff = null;
+		
 		for( Block blk : bufferPoolMap.keySet() ){
 			if (!found){
 				buff = bufferPoolMap.get(blk);
