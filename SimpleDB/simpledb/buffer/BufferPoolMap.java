@@ -58,7 +58,7 @@ public class BufferPoolMap {
 	 * @param fmtr
 	 * @return new buffer or null
 	 */
-	public synchronized Buffer addNew(String filename, PageFormatter fmtr){
+	public Buffer addNew(String filename, PageFormatter fmtr){
 		if (bufferPoolMap.size() == this.capacity){
 			return null;
 		} else {
@@ -84,7 +84,7 @@ public class BufferPoolMap {
 	 * adds buffer to the end of the queue
 	 * @param buff
 	 */
-	public synchronized void addToEndOfQueue(Buffer buff){
+	public void addToEndOfQueue(Buffer buff){
 		bufferPoolMap.put(buff.block(), buff);
 	}
 	
@@ -92,7 +92,7 @@ public class BufferPoolMap {
 	 * removes and returns the oldest buffer that is unpinned in the queue/map
 	 * @return the Buffer object that is at the head of the queue
 	 */
-	public synchronized Buffer removeOldestUnpinned(){
+	public Buffer removeOldestUnpinned(){
 		//removes and returns first buffer in the queue that is NOT pinned AKA not in use
 		boolean found = false;
 		Buffer buff = null;
@@ -107,7 +107,6 @@ public class BufferPoolMap {
 		}
 		return buff;
 	}
-	
 	/**
 	 * returns but does NOT remove the head of the queue
 	 * if empty queue returns null
@@ -126,4 +125,5 @@ public class BufferPoolMap {
 		}
 		return buff;
 	}
+	
 }
