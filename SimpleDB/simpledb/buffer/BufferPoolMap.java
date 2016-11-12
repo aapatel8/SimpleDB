@@ -69,6 +69,17 @@ public class BufferPoolMap {
 		}
 	}
 	
+	public synchronized Buffer addNew(Block blk){
+		if (bufferPoolMap.size() == this.capacity){
+			return null;
+		} else {
+			Buffer buff = new Buffer();
+			buff.assignToBlock(blk);
+			bufferPoolMap.put(buff.block(), buff);
+			return buff;
+		}
+	}
+	
 	/**
 	 * adds buffer to the end of the queue
 	 * @param buff
