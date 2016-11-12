@@ -1,6 +1,8 @@
 package simpledb.buffer;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import simpledb.file.*;
@@ -45,7 +47,7 @@ public class BufferPoolMap {
 		return get(blk);
 	}
 	
-	public Buffer chooseBufferFIFO(){
+	public synchronized Buffer chooseBufferFIFO(){
 		return removeOldestUnpinned();
 	}
 	
@@ -56,7 +58,7 @@ public class BufferPoolMap {
 	 * @param fmtr
 	 * @return new buffer or null
 	 */
-	public synchronized Buffer addNew(String filename, PageFormatter fmtr){
+	public Buffer addNew(String filename, PageFormatter fmtr){
 		if (bufferPoolMap.size() == this.capacity){
 			return null;
 		} else {
@@ -71,7 +73,7 @@ public class BufferPoolMap {
 	 * adds buffer to the end of the queue
 	 * @param buff
 	 */
-	public synchronized void addToEndOfQueue(Buffer buff){
+	public void addToEndOfQueue(Buffer buff){
 		bufferPoolMap.put(buff.block(), buff);
 	}
 	
@@ -79,21 +81,21 @@ public class BufferPoolMap {
 	 * removes and returns the oldest buffer that is unpinned in the queue/map
 	 * @return the Buffer object that is at the head of the queue
 	 */
-	public synchronized Buffer removeOldestUnpinned(){
+	public Buffer removeOldestUnpinned(){
 		//removes and returns first buffer in the queue that is NOT pinned AKA not in use
 		boolean found = false;
 		Buffer buff = null;
-		for( Block blk : bufferPoolMap.keySet() ){
-			if (!found){
-				if (!bufferPoolMap.get(blk).isPinned()){
-					buff = bufferPoolMap.remove(blk);
-					found = true;
-				}
+		Iterator<Entry<Block, Buffer>> it = bufferPoolMap.entrySet().iterator();
+		while (it.hasNext() && !found) {
+			Map.Entry<Block, Buffer> item = it.next();
+			if(!item.getValue().isPinned()){
+				buff = item.getValue();
+				it.remove();
+				found = true;
 			}
 		}
 		return buff;
 	}
-	
 	/**
 	 * returns but does NOT remove the head of the queue
 	 * if empty queue returns null
@@ -103,6 +105,7 @@ public class BufferPoolMap {
 		//only return the first buffer or null if nothing in the queue/map
 		boolean found = false;
 		Buffer buff = null;
+		
 		for( Block blk : bufferPoolMap.keySet() ){
 			if (!found){
 				buff = bufferPoolMap.get(blk);
@@ -111,4 +114,5 @@ public class BufferPoolMap {
 		}
 		return buff;
 	}
+	
 }
