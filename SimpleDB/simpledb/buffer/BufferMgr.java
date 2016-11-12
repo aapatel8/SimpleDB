@@ -68,20 +68,26 @@ public class BufferMgr {
     * @return the buffer pinned to that block
     */
    public synchronized Buffer pin(Block blk) {
-      try {
-         long timestamp = System.currentTimeMillis();
-         Buffer buff = bufferMgr.pin(blk);
-         while (buff == null && !waitingTooLong(timestamp)) {
-            wait(MAX_TIME);
-            buff = bufferMgr.pin(blk);
-         }
-         if (buff == null)
-            throw new BufferAbortException();
-         return buff;
-      }
-      catch(InterruptedException e) {
-         throw new BufferAbortException();
-      }
+	   Buffer buff = bufferMgr.pin(blk);
+	   if (buff == null)
+		   //all buffers were pinned!!!!!!!!!!!! abort abort abort
+           throw new BufferAbortException();
+        return buff;
+        
+//      try {
+//         long timestamp = System.currentTimeMillis();
+//         Buffer buff = bufferMgr.pin(blk);
+//         while (buff == null && !waitingTooLong(timestamp)) {
+//            wait(MAX_TIME);
+//            buff = bufferMgr.pin(blk);
+//         }
+//         if (buff == null)
+//            throw new BufferAbortException();
+//         return buff;
+//      }
+//      catch(InterruptedException e) {
+//         throw new BufferAbortException();
+//      }
    }
    
    /**
@@ -94,24 +100,28 @@ public class BufferMgr {
     * @return the buffer pinned to that block
     */
    public synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
+	   Buffer buff = bufferMgr.pinNew(filename, fmtr);
+	   if (buff == null)
+		   //all buffers were pinned!!!!!!!!!!!! abort abort abort
+           throw new BufferAbortException();
+        return buff;
 	   
 	   
 	   
-	   
-      try {
-         long timestamp = System.currentTimeMillis();
-         Buffer buff = bufferMgr.pinNew(filename, fmtr);
-         while (buff == null && !waitingTooLong(timestamp)) {
-            wait(MAX_TIME);
-            buff = bufferMgr.pinNew(filename, fmtr);
-         }
-         if (buff == null)
-            throw new BufferAbortException();
-         return buff;
-      }
-      catch(InterruptedException e) {
-         throw new BufferAbortException();
-      }
+//      try {
+//         long timestamp = System.currentTimeMillis();
+//         Buffer buff = bufferMgr.pinNew(filename, fmtr);
+//         while (buff == null && !waitingTooLong(timestamp)) {
+//            wait(MAX_TIME);
+//            buff = bufferMgr.pinNew(filename, fmtr);
+//         }
+//         if (buff == null)
+//            throw new BufferAbortException();
+//         return buff;
+//      }
+//      catch(InterruptedException e) {
+//         throw new BufferAbortException();
+//      }
    }
    
    /**

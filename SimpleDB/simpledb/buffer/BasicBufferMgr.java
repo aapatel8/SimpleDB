@@ -52,10 +52,10 @@ class BasicBufferMgr {
 	   numAvailable = numbuffs;
 	   
 	   
-      bufferpool = new Buffer[numbuffs];
-      numAvailable = numbuffs;
-      for (int i=0; i<numbuffs; i++)
-         bufferpool[i] = new Buffer();
+//      bufferpool = new Buffer[numbuffs];
+//      numAvailable = numbuffs;
+//      for (int i=0; i<numbuffs; i++)
+//         bufferpool[i] = new Buffer();
    }
    
    /**
@@ -83,22 +83,36 @@ class BasicBufferMgr {
     * @return the pinned buffer
     */
    synchronized Buffer pin(Block blk) {
+	   //If none available, then return null, catch outside of this and do 
+	   if (numAvailable == 0){
+		   return null;
+	   }
 	   Buffer buff = findExistingBuffer(blk);
+	   if (buff == null) {
+		   //queue was full, so use fifo to remove oldest unpinned buffer
+		   buff = bufferPoolMap.chooseBufferFIFO();
+		   buff.assignToBlock(blk);
+		   //b/c it was replaced we add it to the end of the queue
+		   bufferPoolMap.addToEndOfQueue(buff);
+	   }
+	   if (!buff.isPinned())
+			numAvailable--;
 	   
-	   
+	   buff.pin();
+	   return buff;
 	   
 	   
 	   //Buffer buff = findExistingBuffer(blk);
-      if (buff == null) {
-         buff = chooseUnpinnedBuffer();
-         if (buff == null)
-            return null;
-         buff.assignToBlock(blk);
-      }
-      if (!buff.isPinned())
-         numAvailable--;
-      buff.pin();
-      return buff;
+//      if (buff == null) {
+//         buff = chooseUnpinnedBuffer();
+//         if (buff == null)
+//            return null;
+//         buff.assignToBlock(blk);
+//      }
+//      if (!buff.isPinned())
+//         numAvailable--;
+//      buff.pin();
+//      return buff;
    }
    
    /**
