@@ -6,7 +6,7 @@ import simpledb.file.Block;
 import simpledb.log.BasicLogRecord;
 
 class SetIntRecord implements LogRecord {
-   private int txnum, offset, val;
+   private int txnum, offset, val, newval;
    private Block blk;
 
    /**
@@ -16,11 +16,12 @@ class SetIntRecord implements LogRecord {
     * @param offset the offset of the value in the block
     * @param val the new value
     */
-   public SetIntRecord(int txnum, Block blk, int offset, int val) {
+   public SetIntRecord(int txnum, Block blk, int offset, int val, int newval) {
       this.txnum = txnum;
       this.blk = blk;
       this.offset = offset;
       this.val = val;
+      this.newval = newval;
    }
 
    /**
@@ -34,6 +35,9 @@ class SetIntRecord implements LogRecord {
       blk = new Block(filename, blknum);
       offset = rec.nextInt();
       val = rec.nextInt();
+      
+      //Modified by zach, reading new value from log
+      newval = rec.nextInt();
    }
 
    /**
@@ -45,8 +49,9 @@ class SetIntRecord implements LogRecord {
     * @return the LSN of the last log value
     */
    public int writeToLog() {
+	  // Modified by zach, make sure to write newval 
       Object[] rec = new Object[] {SETINT, txnum, blk.fileName(),
-         blk.number(), offset, val};
+         blk.number(), offset, val, newval};
       return logMgr.append(rec);
    }
 
@@ -59,7 +64,7 @@ class SetIntRecord implements LogRecord {
    }
 
    public String toString() {
-      return "<SETINT " + txnum + " " + blk + " " + offset + " " + val + ">";
+      return "<SETINT " + txnum + " " + blk + " " + offset + " " + val + " " + newval + ">";
    }
 
    /**

@@ -67,7 +67,7 @@ public class RecoveryMgr {
       if (isTempBlock(blk))
          return -1;
       else
-         return new SetIntRecord(txnum, blk, offset, oldval).writeToLog();
+         return new SetIntRecord(txnum, blk, offset, oldval, newval).writeToLog();
    }
 
    /**
