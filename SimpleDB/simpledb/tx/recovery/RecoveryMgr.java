@@ -121,8 +121,9 @@ public class RecoveryMgr {
    private void doRecover() {
       Collection<Integer> finishedTxs = new ArrayList<Integer>();
       Iterator<LogRecord> iter = new LogRecordIterator();
+      PrintWriter pw = null;
       try {
-		PrintWriter pw = new PrintWriter("readableLog.txt", "UTF-8");
+		pw = new PrintWriter("readableLog.txt", "UTF-8");
 		while (iter.hasNext()) {
 	         LogRecord rec = iter.next();
 	         pw.println(rec.toString());
@@ -133,9 +134,10 @@ public class RecoveryMgr {
 	         else if (!finishedTxs.contains(rec.txNumber()))
 	            rec.undo(txnum);
 	      }
-		pw.close();
 	} catch (FileNotFoundException | UnsupportedEncodingException e) {
 		e.printStackTrace();
+	} finally {
+		pw.close();
 	}
    }
 
