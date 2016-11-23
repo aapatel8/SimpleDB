@@ -4,6 +4,10 @@ import static simpledb.tx.recovery.LogRecord.*;
 import simpledb.file.Block;
 import simpledb.buffer.Buffer;
 import simpledb.server.SimpleDB;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -117,15 +121,22 @@ public class RecoveryMgr {
    private void doRecover() {
       Collection<Integer> finishedTxs = new ArrayList<Integer>();
       Iterator<LogRecord> iter = new LogRecordIterator();
-      while (iter.hasNext()) {
-         LogRecord rec = iter.next();
-         if (rec.op() == CHECKPOINT)
-            return;
-         if (rec.op() == COMMIT || rec.op() == ROLLBACK)
-            finishedTxs.add(rec.txNumber());
-         else if (!finishedTxs.contains(rec.txNumber()))
-            rec.undo(txnum);
-      }
+      try {
+		PrintWriter pw = new PrintWriter("readableLog.txt", "UTF-8");
+		while (iter.hasNext()) {
+	         LogRecord rec = iter.next();
+	         pw.println(rec.toString());
+	         if (rec.op() == CHECKPOINT)
+	            return;
+	         if (rec.op() == COMMIT || rec.op() == ROLLBACK)
+	            finishedTxs.add(rec.txNumber());
+	         else if (!finishedTxs.contains(rec.txNumber()))
+	            rec.undo(txnum);
+	      }
+		pw.close();
+	} catch (FileNotFoundException | UnsupportedEncodingException e) {
+		e.printStackTrace();
+	}
    }
 
    /**
