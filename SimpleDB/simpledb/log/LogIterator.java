@@ -10,7 +10,7 @@ import java.util.Iterator;
  * 
  * @author Edward Sciore
  */
-class LogIterator implements Iterator<BasicLogRecord> {
+public class LogIterator implements Iterator<BasicLogRecord> {
    private Block blk;
    private Page pg = new Page();
    private int currentrec;
@@ -34,6 +34,11 @@ class LogIterator implements Iterator<BasicLogRecord> {
     */
    public boolean hasNext() {
       return currentrec>0 || blk.number()>0;
+   }
+   
+   //Not sure, just a guess atm lol
+   public boolean hasNextForward(){
+	   return currentrec <= pg.getInt(LogMgr.LAST_POS);
    }
    
    /**

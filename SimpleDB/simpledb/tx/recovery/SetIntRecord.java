@@ -80,4 +80,18 @@ class SetIntRecord implements LogRecord {
       buff.setInt(offset, val, txnum, -1);
       buffMgr.unpin(buff);
    }
+   
+   /**
+    * Replaces the specified data value with the NEW value saved in the log record.
+    * The method pins a buffer to the specified block,
+    * calls setInt to restore the saved value
+    * (using a dummy LSN), and unpins the buffer.
+    * @see simpledb.tx.recovery.LogRecord#undo(int)
+    */
+   public void redo(int txnum) {
+      BufferMgr buffMgr = SimpleDB.bufferMgr();
+      Buffer buff = buffMgr.pin(blk);
+      buff.setInt(offset, newval, txnum, -1);
+      buffMgr.unpin(buff);
+   }
 }

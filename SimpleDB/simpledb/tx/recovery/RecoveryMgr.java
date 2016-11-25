@@ -120,7 +120,7 @@ public class RecoveryMgr {
     */
    private void doRecover() {
       Collection<Integer> finishedTxs = new ArrayList<Integer>();
-      Iterator<LogRecord> iter = new LogRecordIterator();
+      LogRecordIterator iter = new LogRecordIterator();
       PrintWriter pw = null;
       try {
 		pw = new PrintWriter("readableLog.txt", "UTF-8");
@@ -129,7 +129,7 @@ public class RecoveryMgr {
 	         pw.println(rec.toString());
 	         if (rec.op() == CHECKPOINT){
 	        	//added by Webb Chawla 
-	        	doRedo(finishedTxs); 
+	        	doRedo(finishedTxs, iter); 
 	            return;
 	         }
 	         if (rec.op() == COMMIT || rec.op() == ROLLBACK)
@@ -150,8 +150,16 @@ public class RecoveryMgr {
     * and if the tx is in the finishedTxs list, then restore/redo new value
     * @param finishedTxs
     */
-   private void doRedo(Collection<Integer> finishedTxs) {
-	   
+   private void doRedo(Collection<Integer> finishedTxs, LogRecordIterator iter) {
+	   while (iter.hasNextForward()){
+		   LogRecord rec = iter.nextForward();
+		   if (rec.op() == SETINT || rec.op() == SETSTRING ){
+			   if (finishedTxs.contains(rec.txNumber())){
+				   //redo, had to add method to logrecord interface and add redo method to setint/setstring record classes
+				   rec.redo(txnum);
+			   }
+		   }
+	   }
    }
 
    /**

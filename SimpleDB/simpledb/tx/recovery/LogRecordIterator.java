@@ -3,6 +3,7 @@ package simpledb.tx.recovery;
 import static simpledb.tx.recovery.LogRecord.*;
 import java.util.Iterator;
 import simpledb.log.BasicLogRecord;
+import simpledb.log.LogIterator;
 import simpledb.server.SimpleDB;
 
 /**
@@ -14,7 +15,7 @@ import simpledb.server.SimpleDB;
  * @author Edward Sciore
  */
 class LogRecordIterator implements Iterator<LogRecord> {
-   private Iterator<BasicLogRecord> iter = SimpleDB.logMgr().iterator();
+   private LogIterator iter = SimpleDB.logMgr().iterator();
    
    public boolean hasNext() {
       return iter.hasNext();
@@ -48,7 +49,32 @@ class LogRecordIterator implements Iterator<LogRecord> {
          default:
             return null;
       }
-   } 
+   }
+   
+   public LogRecord nextForward() {
+	   BasicLogRecord rec = iter.nextForward();
+	   int op = rec.nextInt();
+	      switch (op) {
+	         case CHECKPOINT:
+	            return new CheckpointRecord(rec);
+	         case START:
+	            return new StartRecord(rec);
+	         case COMMIT:
+	            return new CommitRecord(rec);
+	         case ROLLBACK:
+	            return new RollbackRecord(rec);
+	         case SETINT:
+	            return new SetIntRecord(rec);
+	         case SETSTRING:
+	            return new SetStringRecord(rec);
+	         default:
+	            return null;
+	      }
+   }
+   
+   public boolean hasNextForward(){
+	   return iter.hasNextForward();
+   }
    
    public void remove() {
       throw new UnsupportedOperationException();
