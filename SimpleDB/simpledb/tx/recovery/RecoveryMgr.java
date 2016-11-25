@@ -127,8 +127,11 @@ public class RecoveryMgr {
 		while (iter.hasNext()) {
 	         LogRecord rec = iter.next();
 	         pw.println(rec.toString());
-	         if (rec.op() == CHECKPOINT)
+	         if (rec.op() == CHECKPOINT){
+	        	//added by Webb Chawla 
+	        	doRedo(finishedTxs); 
 	            return;
+	         }
 	         if (rec.op() == COMMIT || rec.op() == ROLLBACK)
 	            finishedTxs.add(rec.txNumber());
 	         else if (!finishedTxs.contains(rec.txNumber()))
@@ -139,6 +142,16 @@ public class RecoveryMgr {
 	} finally {
 		pw.close();
 	}
+   }
+   
+   /**
+    * Added by Webb Chawla
+    * Start new LogRecordIterator from beginning of log, and if rec is an update
+    * and if the tx is in the finishedTxs list, then restore/redo new value
+    * @param finishedTxs
+    */
+   private void doRedo(Collection<Integer> finishedTxs) {
+	   
    }
 
    /**
