@@ -50,6 +50,33 @@ class LogIterator implements Iterator<BasicLogRecord> {
       return new BasicLogRecord(pg, currentrec+INT_SIZE);
    }
    
+   /**
+    * Added by Webb Chawla
+    * Moves to the next log record in forward order.
+    * If the current log record is the latest in its block,
+    * then the method moves to the next block,
+    * and returns the log record from there.
+    * @return the next log record
+    */
+   public BasicLogRecord nextForward() {
+	   if (currentrec == pg.getInt(LogMgr.LAST_POS)){
+		   moveToNextForwardBlock();
+	   }
+	   currentrec = pg.getInt(currentrec);
+	   return new BasicLogRecord(pg, currentrec+INT_SIZE);
+   }
+   
+   /**
+    * Added by Webb Chawla
+    * Moves to the next log block in forward  order,
+    * and positions it at the first record in that block.
+    */
+   private void moveToNextForwardBlock() {
+	   blk = new Block(blk.fileName(), blk.number()+1);
+	   pg.read(blk);
+	   currentrec = pg.getInt(0);
+   }
+   
    public void remove() {
       throw new UnsupportedOperationException();
    }
