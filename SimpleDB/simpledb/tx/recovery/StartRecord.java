@@ -46,6 +46,12 @@ class StartRecord implements LogRecord {
     */
    public void undo(int txnum) {}
    
+   /**
+    * Does nothing, because a start record
+    * contains no redo information.
+    */
+   public void redo(int txnum) {}
+   
    public String toString() {
       return "<START " + txnum + ">";
    }

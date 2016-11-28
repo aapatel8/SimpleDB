@@ -50,6 +50,13 @@ class RollbackRecord implements LogRecord {
     */
    public void undo(int txnum) {}
    
+   /**
+    * Does nothing, because a rollback record
+    * contains no redo information.
+    */
+   public void redo(int txnum) {}
+   
+   
    public String toString() {
       return "<ROLLBACK " + txnum + ">";
    }
