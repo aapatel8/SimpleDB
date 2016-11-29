@@ -98,6 +98,8 @@ class BasicBufferMgr {
 				   //no unpinned buffers!
 				   return null;
 			   }
+			   //FOR TESTING BUFFERREPLACEMENTFIFOTEST.JAVA ONLY
+			   //System.out.println("FIFO Selected: blk # " + buff.block().number());
 			   buff.assignToBlock(blk);
 			   //b/c it was replaced we add it to the end of the queue
 			   bufferPoolMap.addToEndOfQueue(buff);

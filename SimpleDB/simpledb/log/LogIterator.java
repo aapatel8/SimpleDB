@@ -38,7 +38,7 @@ public class LogIterator implements Iterator<BasicLogRecord> {
    
    //Not sure, just a guess atm lol
    public boolean hasNextForward(){
-	   return currentrec <= pg.getInt(LogMgr.LAST_POS);
+	   return currentrec < pg.getInt(LogMgr.LAST_POS);
    }
    
    /**

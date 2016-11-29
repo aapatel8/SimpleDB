@@ -120,6 +120,7 @@ public class RecoveryMgr {
     */
    private void doRecover() {
       Collection<Integer> finishedTxs = new ArrayList<Integer>();
+      Collection<Integer> rollbackTxs = new ArrayList<Integer>();
       LogRecordIterator iter = new LogRecordIterator();
       PrintWriter pw = null;
       try {
