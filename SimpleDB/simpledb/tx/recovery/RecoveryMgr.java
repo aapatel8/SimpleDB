@@ -120,6 +120,7 @@ public class RecoveryMgr {
     */
    private void doRecover() {
       Collection<Integer> finishedTxs = new ArrayList<Integer>();
+      Collection<Integer> rollbackTxs = new ArrayList<Integer>();
       LogRecordIterator iter = new LogRecordIterator();
       PrintWriter pw = null;
       try {
@@ -132,9 +133,11 @@ public class RecoveryMgr {
 	        	doRedo(finishedTxs, iter); 
 	            return;
 	         }
-	         if (rec.op() == COMMIT || rec.op() == ROLLBACK)
+	         if (rec.op() == COMMIT)
 	            finishedTxs.add(rec.txNumber());
-	         else if (!finishedTxs.contains(rec.txNumber()))
+	         if (rec.op() == ROLLBACK)
+	        	 rollbackTxs.add(rec.txNumber());
+	         else if (!finishedTxs.contains(rec.txNumber()) && !rollbackTxs.contains(rec.txNumber()))
 	            rec.undo(txnum);
 	      }
 	} catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -151,15 +154,29 @@ public class RecoveryMgr {
     * @param finishedTxs
     */
    private void doRedo(Collection<Integer> finishedTxs, LogRecordIterator iter) {
-	   while (iter.hasNextForward()){
-		   LogRecord rec = iter.nextForward();
+	   LogRecord rec = iter.nextForward();
+	   while(rec != null){
 		   if (rec.op() == SETINT || rec.op() == SETSTRING ){
 			   if (finishedTxs.contains(rec.txNumber())){
 				   //redo, had to add method to logrecord interface and add redo method to setint/setstring record classes
 				   rec.redo(txnum);
 			   }
 		   }
+		   rec = iter.nextForward();
 	   }
+	   
+//	   while (iter.hasNextForward() && iter.nextForward() != null ){
+//		   iter.next();
+//		   LogRecord rec = iter.nextForward();
+//		   if (rec.op() == SETINT || rec.op() == SETSTRING ){
+//			   if (finishedTxs.contains(rec.txNumber())){
+//				   //redo, had to add method to logrecord interface and add redo method to setint/setstring record classes
+//				   rec.redo(txnum);
+//			   }
+//		   }
+//	   }
+	   
+	   
    }
 
    /**
