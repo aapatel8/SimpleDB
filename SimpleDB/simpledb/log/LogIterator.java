@@ -79,7 +79,7 @@ public class LogIterator implements Iterator<BasicLogRecord> {
    private void moveToNextForwardBlock() {
 	   blk = new Block(blk.fileName(), blk.number()+1);
 	   pg.read(blk);
-	   currentrec = pg.getInt(0);
+	   currentrec = 0;
    }
    
    public void remove() {
