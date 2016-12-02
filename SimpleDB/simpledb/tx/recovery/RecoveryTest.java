@@ -8,6 +8,7 @@ import simpledb.server.SimpleDB;
 
 public class RecoveryTest {
 	public static void main(String[] args) {
+		
 		SimpleDB.init("simpleDB");
 		BufferMgr bm = new SimpleDB().bufferMgr();
 		
@@ -20,28 +21,27 @@ public class RecoveryTest {
 		
 		int lsn = rm1.setInt(buff, 4, 5);
 		buff.setInt(4, 5, 1, lsn);
+		System.out.println(lsn);
 		lsn = rm1.setInt(buff, 4, 10);
 		buff.setInt(4, 10, 1, lsn);
+		System.out.println(lsn);
 		rm1.commit();
-		bm.flushAll(1);
-		
-
-//		
-		
-		Block blk3 = new Block("filename3", 3);
-		buff = bm.pin(blk3);
-		
-		lsn = rm2.setString(buff, 6, "hello");
-		buff.setString(6, "hello", 2, lsn);
 		bm.unpin(buff);
+		bm.flushAll(1);
 		
 		Block blk2 = new Block("filename2", 2);
 		buff = bm.pin(blk2);
 		lsn = rm2.setInt(buff, 4, 15);
 		buff.setInt(4, 15, 2, lsn);
+		Block blk3 = new Block("filename3", 3);
+		buff = bm.pin(blk3);
+		lsn = rm2.setString(buff, 0, "hello");
+		buff.setString(0, "hello", 2, lsn);
+		bm.unpin(buff);
+		bm.flushAll(2);
 		
-		rm1.recover();
-		//rm2.recover();
+		
+		//rm1.recover();
 //		
 //		lsn =  rm.setInt(buff, 4, 1235);
 //		buff.setInt(4, 1235, 123, lsn);

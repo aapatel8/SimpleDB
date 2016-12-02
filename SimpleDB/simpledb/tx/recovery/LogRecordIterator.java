@@ -53,7 +53,10 @@ class LogRecordIterator implements Iterator<LogRecord> {
    
    public LogRecord nextForward() {
 	   BasicLogRecord rec = iter.nextForward();
-	   int op = rec.nextInt();
+	   Integer op = rec.nextInt();
+	   if (op == null) {
+		   return null;
+	   }
 	      switch (op) {
 	         case CHECKPOINT:
 	            return new CheckpointRecord(rec);

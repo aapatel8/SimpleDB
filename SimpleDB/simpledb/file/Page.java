@@ -1,6 +1,8 @@
 package simpledb.file;
 
 import simpledb.server.SimpleDB;
+
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -115,9 +117,15 @@ public class Page {
     * @param offset the byte offset within the page
     * @return the integer value at that offset
     */
-   public synchronized int getInt(int offset) {
+   public synchronized Integer getInt(int offset) {
       contents.position(offset);
-      return contents.getInt();
+      try {
+    	  int n = contents.getInt();
+    	  return n;
+      } catch (BufferUnderflowException e) {
+    	  return null;
+      }
+      
    }
    
    /**

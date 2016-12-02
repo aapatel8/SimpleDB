@@ -35,8 +35,11 @@ public class BasicLogRecord {
     * assuming it is an integer.
     * @return the next value of the current log record
     */
-   public int nextInt() {
-      int result = pg.getInt(pos);
+   public Integer nextInt() {
+      Integer result = pg.getInt(pos);
+      if (result == null){
+    	  return null;
+      }
       pos += INT_SIZE;
       return result;
    }
